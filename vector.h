@@ -7,15 +7,15 @@
 namespace zsl {
 
 	template<class T>
-	class vector {
+	class Vector {
 	public:
 		typedef T value_type;
-		vector();
-		vector(const vector &v);
-		vector(size_t size, const T &init_value);
-		vector(mempool &pool);
+		Vector();
+		Vector(const Vector &v);
+		Vector(size_t size, const T &init_value);
+		Vector(MemPool &pool);
 
-		virtual ~vector();
+		virtual ~Vector();
 
 		size_t size() const
 		{
@@ -43,13 +43,13 @@ namespace zsl {
 
 		void reserve(size_t size);
 
-		vector &operator=(const vector &v);
+		Vector &operator=(const Vector &v);
 	protected:
 		bool enlarge(size_t size);
 
 	protected:
-		mempool &pool_;
-		sysmempool default_pool_;
+		MemPool &pool_;
+		SysMemPool default_pool_;
 
 	protected:
 		T *items_;
@@ -58,13 +58,13 @@ namespace zsl {
 	};
 
 	template<class T>
-	vector<T>::vector() :
+	Vector<T>::Vector() :
 		items_(NULL), size_(0), cap_(0), pool_(default_pool_)
 	{
 	}
 
 	template<class T>
-	vector<T>::vector(const vector &v) :
+	Vector<T>::Vector(const Vector &v) :
 		items_(NULL), size_ (v.size_), cap_(0), pool_(v.pool_)
 	{
 		if (size_ > 0 && enlarge(size_)) {
@@ -75,13 +75,13 @@ namespace zsl {
 	}
 
 	template<class T>
-	vector<T>::vector(mempool &pool) :
+	Vector<T>::Vector(MemPool &pool) :
 		items_(NULL), size_(0), cap_(0), pool_(pool)
 	{
 	}
 
 	template<class T>
-	vector<T>::vector(size_t size, const T &init_value) :
+	Vector<T>::Vector(size_t size, const T &init_value) :
 		items_(NULL), size_(0), cap_(0), pool_(default_pool_)
 	{
 		enlarge(size);
@@ -92,7 +92,7 @@ namespace zsl {
 
 
 	template<class T>
-	vector<T>::~vector()
+	Vector<T>::~Vector()
 	{
 		if (cap_ == 0) {
 			return;
@@ -106,7 +106,7 @@ namespace zsl {
 
 
 	template<class T>
-	bool vector<T>::enlarge(size_t size)
+	bool Vector<T>::enlarge(size_t size)
 	{
 		size = size |0x03 +1;
 		value_type *new_items_ = (value_type*)pool_.reallocate(
@@ -123,7 +123,7 @@ namespace zsl {
 
 
 	template<class T>
-	void vector<T>::push_back(const T &data)
+	void Vector<T>::push_back(const T &data)
 	{
 		if (size_ < cap_ || enlarge(1)) {
 			new(items_+size_++) value_type (data);
@@ -132,7 +132,7 @@ namespace zsl {
 
 
 	template<class T>
-	void vector<T>::resize(size_t newsize, const value_type &val)
+	void Vector<T>::resize(size_t newsize, const value_type &val)
 	{
 		if (newsize > cap_) {
 			enlarge(newsize-cap_);
@@ -148,7 +148,7 @@ namespace zsl {
 	}
 
 	template<class T>
-	void vector<T>::reserve(size_t size)
+	void Vector<T>::reserve(size_t size)
 	{
 		if (size > cap_) {
 			enlarge(size - cap_);
@@ -156,7 +156,7 @@ namespace zsl {
 	}
 
 	template<class T>
-	vector<T> &vector<T>::operator=(const vector<T> &v)
+	Vector<T> &Vector<T>::operator=(const Vector<T> &v)
 	{
 		if (this != &v) {
 			size_t i;
