@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include "vector.h"
 #include "mempool.h"
+#include "string.h"
 #include <vector>
 
 class A
 {
 public:
-A()
-{
-}
+	A()
+	{
+	}
+
 	A(int a):
 		a_(a)
 	{
@@ -30,18 +32,27 @@ A()
 
 int main()
 {
-	zsl::nonfreemempool mp;
-	zsl::vector<A> v(mp);
+	//zsl::NonFreeMemPool mp;
+	zsl::SlabedMemPool mp(4, 128, 1.2);
+	zsl::String s(mp);
+
+	s = "hel";
+	s += "lo world";
+
+	printf("%s\n", s.c_str());
+/*
+	zsl::Vector<A> v(mp);
 
 
 	v.push_back(A(10));
 	v.push_back(A(20));
 
-	zsl::vector<A> v2;
+	zsl::Vector<A> v2;
 	v2 = v;
 	for (int i = 0; i < v2.size(); ++i) {
 		printf("%d\n", v2[i].a_);
 	}
+*/
 
 
 /*
