@@ -1,25 +1,26 @@
 #include "mempool.h"
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 
 namespace zsl {
 
-inline size_t mempool::align(size_t size)
+inline size_t MemPool::align(size_t size)
 {
 	return (size & 3) ? ((size|3) + 1) : size;
 }
 
-void *sysmempool::allocate(size_t size)
+void *SysMemPool::allocate(size_t size)
 {
 	return ::malloc(size);
 }
 
-void *sysmempool::reallocate(void *ptr, size_t size, size_t)
+void *SysMemPool::reallocate(void *ptr, size_t size, size_t)
 {
 	return ::realloc(ptr, size);
 }
 
-void sysmempool::free(void *ptr, size_t size)
+void SysMemPool::free(void *ptr, size_t size)
 {
 	return ::free(ptr);
 }
@@ -27,9 +28,9 @@ void sysmempool::free(void *ptr, size_t size)
 
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
-//class nonfreemempool
+//class NonFreeMemPool
 #define MIN_BLOCK_SIZE (4*1024)
-nonfreemempool::nonfreemempool(size_t block_size)
+NonFreeMemPool::NonFreeMemPool(size_t block_size)
 	: block_size_(block_size), head_(NULL)
 {
 	if (block_size_ < MIN_BLOCK_SIZE) {
@@ -39,7 +40,7 @@ nonfreemempool::nonfreemempool(size_t block_size)
 	head_ = newblock(block_size_);
 }
 
-nonfreemempool::~nonfreemempool()
+NonFreeMemPool::~NonFreeMemPool()
 {
 	struct memnode *p = head_;
 	while (p) {
@@ -50,7 +51,7 @@ nonfreemempool::~nonfreemempool()
 
 }
 
-void *nonfreemempool::allocate(size_t size)
+void *NonFreeMemPool::allocate(size_t size)
 {
 	if (size > head_->size) {
 		struct memnode *p = newblock(size+sizeof(struct memnode));
@@ -72,7 +73,7 @@ void *nonfreemempool::allocate(size_t size)
 	return data+cur;
 }
 
-void *nonfreemempool::reallocate(void *ptr, size_t size, size_t old_size)
+void *NonFreeMemPool::reallocate(void *ptr, size_t size, size_t old_size)
 {
 	if (size <= old_size)
 		return ptr;
@@ -92,11 +93,11 @@ void *nonfreemempool::reallocate(void *ptr, size_t size, size_t old_size)
 	return p;
 }
 
-void nonfreemempool::free(void *ptr, size_t size)
+void NonFreeMemPool::free(void *ptr, size_t size)
 {
 }
 
-struct nonfreemempool::memnode *nonfreemempool::newblock(size_t size)
+struct NonFreeMemPool::memnode *NonFreeMemPool::newblock(size_t size)
 {
 	struct memnode *node;
 	if (size < MIN_BLOCK_SIZE) {
@@ -111,17 +112,17 @@ struct nonfreemempool::memnode *nonfreemempool::newblock(size_t size)
 }
 
 
-slabedmempool::slabedmempool(size_t min, size_t max, float factor)
+SlabedMemPool::SlabedMemPool(size_t min, size_t max, float factor)
 	: clzs_(NULL), size_(0)
 {
 	size_t cur = min;
 	size_t prev = 0;
 	while (true) {
+		cur = align(cur);
 		if (cur != prev) {
 			prev = cur;
-			size_t size = align(cur);
 			clzs_ = (struct classz *)pool_.reallocate(clzs_, sizeof(struct classz)*(size_+1), sizeof(struct classz)*size_);
-			clzs_[size_].size = size;
+			clzs_[size_].size = cur;
 			clzs_[size_].slabs = NULL;
 			size_ += 1;
 		}
@@ -129,15 +130,15 @@ slabedmempool::slabedmempool(size_t min, size_t max, float factor)
 		if (cur > max)
 			break;
 
-		cur *= factor;
+		cur = ceil(cur*factor);
 	}
 }
 
-slabedmempool::~slabedmempool()
+SlabedMemPool::~SlabedMemPool()
 {
 }
 
-void *slabedmempool::allocate(size_t size)
+void *SlabedMemPool::allocate(size_t size)
 {
 	int clzid = classid(size);
 	if (clzid < 0) {
@@ -150,19 +151,26 @@ void *slabedmempool::allocate(size_t size)
 
 		return head+1;
 	} else {
-		struct slab * blk = (struct slab *)pool_.allocate(sizeof(struct slab)+size);
+        size_t new_size = sizeof(struct slab)+align(size);
+		struct slab * blk = (struct slab *)pool_.allocate(new_size);
 		return blk+1;
 	}
 }
 
-void *slabedmempool::reallocate(void *ptr, size_t size, size_t old_size)
+void *SlabedMemPool::reallocate(void *ptr, size_t size, size_t old_size)
 {
 	void *p = allocate(size);
-	memcpy(p, ptr, size);
-	free(ptr, old_size);
+    if (ptr != NULL && old_size > 0) {
+        if (p != NULL) {
+	        memcpy(p, ptr, old_size);
+        }
+	    free(ptr, old_size);
+    }
+
+    return p;
 }
 
-void slabedmempool::free(void *ptr, size_t size)
+void SlabedMemPool::free(void *ptr, size_t size)
 {
 	int clzid = classid(size);
 	if (clzid < 0) {
@@ -173,12 +181,11 @@ void slabedmempool::free(void *ptr, size_t size)
 	clzs_[clzid].slabs = blk;
 }
 
-int slabedmempool::classid(size_t size)
+int SlabedMemPool::classid(size_t size)
 {
 	size = align(size);
 	int min = 0, max = (int)size_-1;
-
-	while (min < max) {
+	while (min <= max) {
 		int mid = (min+max)/2;
 		if (size > clzs_[mid].size) {
 			min = mid+1;

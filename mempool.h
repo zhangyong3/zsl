@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 namespace zsl {
-	class mempool
+	class MemPool
 	{
 	public:
 		virtual void *allocate(size_t size) = 0;
@@ -16,7 +16,7 @@ namespace zsl {
 	};
 
 
-	class sysmempool : public mempool
+	class SysMemPool : public MemPool
 	{
 	public:
 		void *allocate(size_t size);
@@ -25,11 +25,11 @@ namespace zsl {
 	};
 
 
-	class nonfreemempool : public mempool
+	class NonFreeMemPool : public MemPool
 	{
 	public:
-		nonfreemempool(size_t block_size = 4*1024);
-		~nonfreemempool();
+		NonFreeMemPool(size_t block_size = 4*1024);
+		~NonFreeMemPool();
 
 		void *allocate(size_t size);
 		void *reallocate(void *ptr, size_t size, size_t old_size);
@@ -48,11 +48,11 @@ namespace zsl {
 	};
 
 
-	class slabedmempool : public mempool
+	class SlabedMemPool : public MemPool
 	{
 	public:
-		slabedmempool(size_t min, size_t max, float factor=1.2);
-		~slabedmempool();
+		SlabedMemPool(size_t min, size_t max, float factor=1.2);
+		~SlabedMemPool();
 
 		void *allocate(size_t size);
 		void *reallocate(void *ptr, size_t size, size_t old_size);
@@ -73,7 +73,7 @@ namespace zsl {
 
 		struct classz *clzs_;
 		size_t size_;
-		nonfreemempool pool_;
+		NonFreeMemPool pool_;
 	};
 
 } //end namespace
