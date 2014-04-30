@@ -1,4 +1,5 @@
 #include "string.h"
+#include "mempool.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -7,18 +8,23 @@
 
 namespace zsl {
 String::String()
-:buf(NULL), len(0), capacity(0)
+:buf(NULL), len(0), capacity(0), pool_(syspool_)
+{
+}
+
+String::String (MemPool &pool)
+:buf(NULL), len(0), capacity(0), pool_(pool)
 {
 }
 
 String::String (int l)
-:buf(NULL), len(0), capacity(0)
+:buf(NULL), len(0), capacity(0), pool_(syspool_)
 {
 	resize(l);
 }
 
 String::String(const char *s, int l)
-:buf(NULL), len(0), capacity(0)
+:buf(NULL), len(0), capacity(0), pool_(syspool_)
 {
 	if (l <= 0) {
 		if (s != NULL)
@@ -35,7 +41,7 @@ String::String(const char *s, int l)
 }
 
 String::String(const String &str)
-:buf(NULL), len(0), capacity(0)
+:buf(NULL), len(0), capacity(0), pool_(syspool_)
 {
 	if (str.len > 0 && resize(str.len+1)) {
 		memcpy(buf, str.buf, str.len);
@@ -47,7 +53,7 @@ String::String(const String &str)
 String::~String()
 {
 	if (buf != NULL)
-		free(buf);
+		pool_.free(buf, capacity);
 }
 
 bool String::resize(int size)
@@ -66,7 +72,7 @@ bool String::resize(int size)
 	}
 
 	size += 8-size%8;
-	char *newbuf = (char*)realloc(buf, size);
+	char *newbuf = (char*)pool_.reallocate(buf, size, capacity);
 	if (!newbuf)
 		return false;
 

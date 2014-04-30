@@ -1,11 +1,14 @@
 #ifndef STRING_H
 #define STRING_H
 
+#include "mempool.h"
+
 namespace zsl {
 	class String
 	{
 	public:
 		String ();
+		String (MemPool &pool);
 		explicit String (int len);
 		String (const char *s, int len=-1);
 		String (const String &str);
@@ -65,6 +68,8 @@ namespace zsl {
 		char *buf;
 		int len;
 		int capacity;
+		MemPool &pool_;
+		SysMemPool syspool_;
 	};
 
 	String operator + (const char *s, const String &str);
