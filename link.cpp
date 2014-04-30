@@ -3,7 +3,7 @@
 
 namespace zsl {
 Node::Node()
-:m_pPrev(NULL), m_pNext(NULL)
+:prev(NULL), next(NULL)
 {
 }
 
@@ -14,15 +14,15 @@ Node::~Node()
 Node *Node::insertAfter(Node *p)
 {
 	if (p != NULL) {
-		if (m_pNext != NULL) {
-			m_pNext->m_pPrev = p;
-			p->m_pNext = m_pNext;
+		if (next != NULL) {
+			next->prev = p;
+			p->next = next;
 		} else {
-			p->m_pNext = NULL;
+			p->next = NULL;
 		}
 
-		m_pNext = p;
-		p->m_pPrev = this;
+		next = p;
+		p->prev = this;
 	}
 
 	return this;
@@ -32,13 +32,13 @@ Node *Node::insertAfter(Node *p)
 Node *Node::insertBefore(Node *p)
 {
 	if (p != NULL) {
-		if (m_pPrev != NULL) {
-			m_pPrev->m_pNext = p;
-			p->m_pPrev = m_pPrev;
+		if (prev != NULL) {
+			prev->next = p;
+			p->prev = prev;
 		}
 
-		m_pPrev = p;
-		p->m_pNext = this;
+		prev = p;
+		p->next = this;
 	}
 
 	return this;
@@ -46,15 +46,15 @@ Node *Node::insertBefore(Node *p)
 
 Node *Node::remove()
 {
-	if (m_pPrev != NULL) {
-		m_pPrev->m_pNext = m_pNext;
+	if (prev != NULL) {
+		prev->next = next;
 	}
 	
-	if (m_pNext != NULL) {
-		m_pNext->m_pPrev = m_pPrev;
+	if (next != NULL) {
+		next->prev = prev;
 	}
 
-	m_pPrev = m_pNext = NULL;
+	prev = next = NULL;
 	return this;
 }
 
@@ -86,7 +86,7 @@ unsigned int Node::distanceTo(Node *n)
 
 //class Link
 Link::Link()
-:m_nCount(0), m_pFront(NULL), m_pRear(NULL)
+:count(0), front(NULL), rear(NULL)
 {
 }
 
@@ -97,47 +97,47 @@ Link::~Link()
 
 void Link::insertFront(Node *p)
 {
-	if (m_pFront == NULL) {
-		m_pFront = m_pRear = p;
+	if (front == NULL) {
+		front = rear = p;
 	} else {
-		m_pFront->insertBefore(p);
-		m_pFront = p;
+		front->insertBefore(p);
+		front = p;
 	}
-	++m_nCount;
+	++count;
 }
 
 void Link::insertRear(Node *p)
 {
-	if (m_pRear == NULL) {
-		m_pFront = m_pRear = p;
+	if (rear == NULL) {
+		front = rear = p;
 	} else {
-		m_pRear->insertAfter(p);
-		m_pRear = p;
+		rear->insertAfter(p);
+		rear = p;
 	}
-	++m_nCount;
+	++count;
 }
 
 Node *Link::removeFront()
 {
-	return remove(m_pFront);
+	return remove(front);
 }
 
 Node *Link::removeRear()
 {
-	return remove(m_pRear);
+	return remove(rear);
 }
 
 Node *Link::remove(Node *p)
 {
 	if (p) {
-		if (p == m_pFront) {
-			m_pFront = p->getNext();
+		if (p == front) {
+			front = p->getNext();
 		}
-		if (p == m_pRear) {
-			m_pRear = p->getPrev();
+		if (p == rear) {
+			rear = p->getPrev();
 		}
 		p->remove();
-		--m_nCount;
+		--count;
 	}
 
 	return p;
@@ -145,8 +145,8 @@ Node *Link::remove(Node *p)
 
 void Link::removeAll()
 {
-	m_pFront = m_pRear = NULL;
-	m_nCount = 0;
+	front = rear = NULL;
+	count = 0;
 }
 
 }

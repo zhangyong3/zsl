@@ -7,8 +7,8 @@ class Node
 public:
 	Node();
 	virtual ~Node();
-	Node *getPrev() {return m_pPrev;}
-	Node *getNext() {return m_pNext;}
+	Node *getPrev() {return prev;}
+	Node *getNext() {return next;}
 
 	Node *getNodeSkip(int i);
 	unsigned int distanceTo(Node *n);
@@ -19,8 +19,8 @@ protected:
 	Node *remove();
 
 private:
-	Node *m_pPrev;
-	Node *m_pNext;
+	Node *prev;
+	Node *next;
 
 	friend class Link;
 };
@@ -31,11 +31,11 @@ class Link
 public:
 	Link();
 	virtual ~Link();
-	Node *getFront() {return m_pFront;}
-	Node *getRear() {return m_pRear;}
-	const Node *getFront() const {return m_pFront;}
-	const Node *getRear() const {return m_pRear;}
-	int size() const {return m_nCount;}
+	Node *getFront() {return front;}
+	Node *getRear() {return rear;}
+	const Node *getFront() const {return front;}
+	const Node *getRear() const {return rear;}
+	int size() const {return count;}
 
 	void insertFront(Node *p);
 	void insertRear(Node *p);
@@ -47,9 +47,9 @@ public:
 	void removeAll();
 
 private:
-	int m_nCount;
-	Node *m_pFront;
-	Node *m_pRear;
+	int count;
+	Node *front;
+	Node *rear;
 };
 
 }
