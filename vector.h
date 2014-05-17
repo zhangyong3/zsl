@@ -26,9 +26,9 @@ namespace zsl {
 				return buf_[index_];
 			}
 
-			T &operator->()
+			T *operator->()
 			{
-				return buf_[index_];
+				return &buf_[index_];
 			}
 
 			_VectorIterator &operator-(int i)

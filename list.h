@@ -33,9 +33,9 @@ protected:
 			return cur->data;
 		}
 
-		T &operator->()
+		T *operator->()
 		{
-			return cur->data;
+			return &cur->data;
 		}
 
 		__List_Iterator &operator++()

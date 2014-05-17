@@ -3,6 +3,7 @@
 
 #include "rbtree.h"
 #include <functional>
+#include <utility>
 
 namespace zsl {
 
@@ -46,9 +47,9 @@ protected:
 			return ((_SetNode*)cur)->data;
 		}
 
-		T &operator->()
+		T *operator->()
 		{
-			return ((_SetNode*)cur)->data;
+			return &(((_SetNode*)cur)->data);
 		}
 
 		_SetIterator &operator++()
@@ -57,7 +58,7 @@ protected:
 			return *this;
 		}
 
-		_SetIterator &operator++(int)
+		_SetIterator operator++(int)
 		{
 			TreeNode *p = cur;
 			operator++();
