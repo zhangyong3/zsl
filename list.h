@@ -64,7 +64,7 @@ protected:
 			return cur != it.cur;
 		}
 
-	protected:
+	public:
 		bool isReverse;
 		__ListNode *cur;
 	};
@@ -110,6 +110,13 @@ public:
 
 	T erase(Iterator it);
 
+	void insert(Iterator it, const T &data)
+	{
+		__ListNode *p = getNode(data);
+		if (p != NULL) {
+			list.insertBefore(it.cur, p);
+		}
+	}
 protected:
 	__ListNode *getNode(const T &data);
 

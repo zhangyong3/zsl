@@ -39,8 +39,10 @@ public:
 	const Node *getRear() const {return rear;}
 	size_t size() const {return count;}
 
-	void insertFront(Node *p);
-	void insertRear(Node *p);
+	void insertFront(Node *newNode);
+	void insertRear(Node *newNode);
+	void insertBefore(Node *p, Node *newNode);
+	void insertAfter(Node *p, Node *newNode);
 
 	Node *removeFront();
 	Node *removeRear();

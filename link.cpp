@@ -117,6 +117,30 @@ void Link::insertRear(Node *p)
 	++count;
 }
 
+void Link::insertBefore(Node *p, Node *newNode)
+{
+	p->insertBefore(newNode);
+	if (p == front) {
+		front = newNode;
+	}
+	if (p == rear) {
+		rear = newNode;
+	}
+	++count;
+}
+
+void Link::insertAfter(Node *p, Node *newNode)
+{
+	p->insertAfter(newNode);
+	if (p == front) {
+		front = newNode;
+	}
+	if (p == rear) {
+		rear = newNode;
+	}
+	++count;
+}
+
 Node *Link::removeFront()
 {
 	return remove(front);
