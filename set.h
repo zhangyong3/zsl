@@ -27,6 +27,11 @@ protected:
 				return 0;
 			}
 		}
+		virtual void copy(const TreeNode &node)
+		{
+			const T &d = ((const _SetNode&)node).data;
+			data = d;
+		}
 	};
 	class _SetIterator
 	{
@@ -68,7 +73,7 @@ protected:
 			return !operator==(it);
 		}
 		
-	private:
+	public:
 		RBTree *tree;
 		TreeNode *cur;
 		bool isReverse;
@@ -112,10 +117,22 @@ public:
 		return end();
 	}
 
-	void add(const T &data)
+	void insert(const T &data)
 	{
 		_SetNode *node = new _SetNode(data);
-		insert(node);
+		RBTree::insert(node);
+	}
+
+	void erase(Iterator it)
+	{
+		if (it.cur != &nil) {
+			delete RBTree::remove(it.cur);
+		}
+	}
+
+	size_t size() const
+	{
+		return RBTree::size();
 	}
 };
 
