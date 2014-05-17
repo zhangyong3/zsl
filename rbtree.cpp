@@ -1,9 +1,10 @@
 #include "rbtree.h"
+#include "stdio.h"
 
 namespace zsl {
 
 RBTree::RBTree()
-	:size(0)
+	:size_(0)
 {
 	root = &nil;
 }
@@ -59,7 +60,7 @@ void RBTree::insert(TreeNode *z)
 		}
 	}
 
-	size++;
+	++size_;
 	insertFixup(z);
 }
 
@@ -90,41 +91,49 @@ TreeNode *RBTree::remove(TreeNode *z)
 
 	TreeNode::COLOR_T color = y->color;
 	if (y != z) {
-		//z->data = y->data;
-		y->parent = z->parent;
-		y->left = z->left;
-		y->right = z->right;
+		z->copy(*y);
+		//y->parent = z->parent;
+		//y->left = z->left;
+		//y->right = z->right;
 
-		if (z->left != &nil) {
-			z->left->parent = y;
-		}
-		if (z->right != &nil) {
-			z->right->parent = y;
-		}
-		if (z->parent != &nil) {
-			if (z == z->parent->left) {
-				z->parent->left = y;
-			} else {
-				z->parent->right = y;
-			}
-		}
-		y->color = z->color;
+		//if (z->left != &nil) {
+		//	z->left->parent = y;
+		//}
+		//if (z->right != &nil) {
+		//	z->right->parent = y;
+		//}
+		//if (z->parent != &nil) {
+		//	if (z == z->parent->left) {
+		//		z->parent->left = y;
+		//	} else {
+		//		z->parent->right = y;
+		//	}
+		//}
+		//y->color = z->color;
+
+		//if (z == root) {
+		//	root = y;
+		//	root->parent = &nil;
+		//	nil.left = nil.right = root;
+		//}
+		//y = z;
 	}
 
 	if (color == TreeNode::BLACK) {
 		removeFixup(x);
 	}
-	size--;
+	--size_;
 
-	return z;
+	return y;
 }
 
 
 void RBTree::removeAll()
 {
-	//while ((volatile TreeNode*)root != &nil) {
-	//	delete remove(root);
-	//}
+	while ((volatile TreeNode*)root != &nil) {
+		TreeNode *p = remove(root);
+		delete p;
+	}
 }
 
 

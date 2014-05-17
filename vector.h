@@ -3,13 +3,97 @@
 
 #include "mempool.h"
 #include <new>
+#include <string.h>
 
 namespace zsl {
-
 	template<class T>
 	class Vector {
+	protected:
+		struct _VectorIterator
+		{
+			_VectorIterator(T *items, size_t size, ssize_t index, bool reverse=false)
+				: buf_(items), size_(size), index_(index), isReverse(reverse)
+			{
+			}
+
+			T &operator*()
+			{
+				return buf_[index_];
+			}
+
+			const T &operator*() const
+			{
+				return buf_[index_];
+			}
+
+			T &operator->()
+			{
+				return buf_[index_];
+			}
+
+			_VectorIterator &operator-(int i)
+			{
+				if (isReverse) {
+					index_+=i;
+				} else {
+					index_-=i;
+				}
+				return *this;
+			}
+			_VectorIterator &operator+(int i)
+			{
+				if (isReverse) {
+					index_-=i;
+				} else {
+					index_+=i;
+				}
+				return *this;
+			}
+
+			_VectorIterator &operator++()
+			{
+				if (isReverse) {
+					--index_;
+				} else {
+					++index_;
+				}
+				return *this;
+			}
+
+			_VectorIterator operator++(int)
+			{
+				int oldIndex = index_;
+				if (isReverse) {
+					--index_;
+				} else {
+					++index_;
+				}
+				return _VectorIterator(buf_, size_, oldIndex, isReverse);
+			}
+
+			bool operator == (const _VectorIterator &it)
+			{
+				return index_ == it.index_ &&
+					size_ == it.size_ &&
+					buf_ == it.buf_;
+			}
+
+			bool operator != (const _VectorIterator &it)
+			{
+				return !operator==(it);
+			}
+
+		public:
+			T *buf_;
+			size_t size_;
+			ssize_t index_;
+			bool isReverse;
+		};
 	public:
 		typedef T value_type;
+		typedef _VectorIterator Iterator;
+
+	public:
 		Vector();
 		Vector(const Vector &v);
 		Vector(size_t size, const T &init_value);
@@ -27,7 +111,52 @@ namespace zsl {
 			return cap_;
 		}
 
-		void push_back(const T &item);
+		void push_back(const T &item)
+		{
+			insert(size_, item);
+		}
+
+		T &back()
+		{
+			return items_[size_-1];
+		}
+
+		const T &back() const
+		{
+			return items_[size_-1];
+		}
+
+		void pop_back()
+		{
+			if (size_ > 0) {
+				size_ -= 1;
+				items_[size].~value_type();
+			}
+		}
+
+		T &front()
+		{
+			return items_[0];
+		}
+
+		const T &front() const
+		{
+			return items_[0];
+		}
+
+		void pop_front()
+		{
+			if (size_ > 0) {
+				items_[0].~value_type();
+				size_ -= 1;
+				mememove(items_, items_+1, sizeof(T)*(size_));
+			}
+		}
+
+		void push_front(const T &item)
+		{
+			insert(0, item);
+		}
 
 		T &operator[](int index)
 		{
@@ -44,6 +173,51 @@ namespace zsl {
 		void reserve(size_t size);
 
 		Vector &operator=(const Vector &v);
+
+		Iterator begin()
+		{
+			return Iterator(items_, size_, 0);
+		}
+
+		Iterator end()
+		{
+			return Iterator(items_, size_, size_);
+		}
+
+		Iterator rbegin()
+		{
+			return Iterator(items_, size_, size_-1, true);
+		}
+
+		Iterator rend()
+		{
+			return Iterator(items_, size_, -1, true);
+		}
+
+		void erase(Iterator it)
+		{
+			if (it.index_ < size_) {
+				items_[it.index_].~value_type();
+				memmove(items_+it.index_, items_+it.index_+1, sizeof(T)*(size_-it.index_-1));
+				--size_;
+			}
+		}
+
+		void insert(int index, const T &data)
+		{
+			if (index > size_)
+				return;
+
+			if (size_ >= cap_) {
+				enlarge(size_);
+			}
+
+			if (index < cap_) {
+				memmove(items_+index+1, items_+index, sizeof(T)*(size_-index));
+				new (items_+index) value_type(data);
+				++size_;
+			}
+		}
 	protected:
 		bool enlarge(size_t size);
 
@@ -119,15 +293,6 @@ namespace zsl {
 		cap_+= size;
 		items_ = new_items_;
 		return true;
-	}
-
-
-	template<class T>
-	void Vector<T>::push_back(const T &data)
-	{
-		if (size_ < cap_ || enlarge(1)) {
-			new(items_+size_++) value_type (data);
-		}
 	}
 
 

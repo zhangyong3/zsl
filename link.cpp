@@ -58,10 +58,10 @@ Node *Node::remove()
 	return this;
 }
 
-Node *Node::getNodeSkip(int i)
+const Node *Node::getNodeSkip(int i) const
 {
 	if (i < 0) return NULL;
-	Node *p = this;
+	const Node *p = this;
 
 	while (p && i-- > 0) {
 		p = p->getNext();
@@ -70,9 +70,9 @@ Node *Node::getNodeSkip(int i)
 	return p;
 }
 
-unsigned int Node::distanceTo(Node *n)
+unsigned int Node::distanceTo(Node *n) const
 {
-	Node *p = this;
+	const Node *p = this;
 	unsigned int i = 0;
 	while (p) {
 		if (p == n) break;

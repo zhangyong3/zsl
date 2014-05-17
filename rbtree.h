@@ -11,7 +11,9 @@ public:
 		color = c;
 		parent = left = right = NULL;
 	}
+	virtual ~TreeNode() {}
 	virtual int compare(const TreeNode &node) = 0;
+	virtual void copy(const TreeNode &node) = 0;
 public:
 	TreeNode *parent;
 	TreeNode *left;
@@ -30,7 +32,7 @@ public:
 	void insert(TreeNode *data);
 	TreeNode *remove(TreeNode *data);
 	void removeAll();
-	size_t Size() const {return size;}
+	size_t size() const {return size_;}
 
 public:
 	TreeNode *getSuccessor(TreeNode *x);
@@ -47,12 +49,13 @@ public:
 	struct NilNode : public TreeNode {
 		NilNode() : TreeNode(TreeNode::BLACK) {}
 		int compare(const TreeNode &node) { return 0;}
+		void copy(const TreeNode &node) {}
 	};
 	NilNode nil;
 
 protected:
 	TreeNode *root;
-	size_t size;
+	size_t size_;
 };
 
 }

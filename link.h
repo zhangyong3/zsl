@@ -1,5 +1,7 @@
-#ifndef _LINK_HPP_
-#define _LINK_HPP_
+#ifndef _ZSL_LINK_H_
+#define _ZSL_LINK_H_
+
+#include <string.h>
 
 namespace zsl {
 class Node
@@ -7,11 +9,11 @@ class Node
 public:
 	Node();
 	virtual ~Node();
-	Node *getPrev() {return prev;}
-	Node *getNext() {return next;}
+	Node *getPrev() const {return prev;}
+	Node *getNext() const {return next;}
 
-	Node *getNodeSkip(int i);
-	unsigned int distanceTo(Node *n);
+	const Node *getNodeSkip(int i) const;
+	unsigned int distanceTo(Node *n) const;
 
 protected:
 	Node *insertAfter(Node *p);
@@ -31,11 +33,11 @@ class Link
 public:
 	Link();
 	virtual ~Link();
-	Node *getFront() {return front;}
-	Node *getRear() {return rear;}
+	//Node *getFront() {return front;}
+	//Node *getRear() {return rear;}
 	const Node *getFront() const {return front;}
 	const Node *getRear() const {return rear;}
-	int size() const {return count;}
+	size_t size() const {return count;}
 
 	void insertFront(Node *p);
 	void insertRear(Node *p);
@@ -47,7 +49,7 @@ public:
 	void removeAll();
 
 private:
-	int count;
+	size_t count;
 	Node *front;
 	Node *rear;
 };
