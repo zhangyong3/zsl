@@ -7,6 +7,7 @@ namespace zsl {
 	class MemPool
 	{
 	public:
+		virtual ~MemPool() {}
 		virtual void *allocate(size_t size) = 0;
 		virtual void *reallocate(void *ptr, size_t size, size_t old_size) = 0;
 		virtual void free(void *ptr, size_t size) = 0;
@@ -29,6 +30,7 @@ namespace zsl {
 	{
 	public:
 		NonFreeMemPool(size_t block_size = 4*1024);
+		NonFreeMemPool(const NonFreeMemPool& pool);
 		~NonFreeMemPool();
 
 		void *allocate(size_t size);
@@ -57,6 +59,11 @@ namespace zsl {
 		void *allocate(size_t size);
 		void *reallocate(void *ptr, size_t size, size_t old_size);
 		void free(void *ptr, size_t size);
+
+	private:
+		//TODO:
+		SlabedMemPool(const SlabedMemPool &pool);
+		SlabedMemPool & operator=(const SlabedMemPool &pool);
 
 	protected:
 		int classid(size_t size);

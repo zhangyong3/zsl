@@ -2,7 +2,7 @@
 CC=g++ -g
 LD=g++
 OBJ=mempool.o test.o string.o strtok.o link.o rbtree.o binbuf.o \
-	file.o
+	file.o variant.o
 
 test: $(OBJ)
 	$(LD) -o $@ $^

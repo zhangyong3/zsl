@@ -35,8 +35,8 @@ public:
 	size_t size() const {return size_;}
 
 public:
-	TreeNode *getSuccessor(TreeNode *x);
-	TreeNode *getAncestor(TreeNode *x);
+	const TreeNode *getSuccessor(const TreeNode *x) const;
+	const TreeNode *getAncestor(const TreeNode *x) const;
 protected:
 	void initNode(TreeNode *node, TreeNode::COLOR_T color);
 	void leftRotate(TreeNode *x);

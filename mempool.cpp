@@ -50,6 +50,11 @@ NonFreeMemPool::~NonFreeMemPool()
 	}
 
 }
+NonFreeMemPool::NonFreeMemPool(const NonFreeMemPool& pool)
+{
+	block_size_ = pool.block_size_;
+	head_ = newblock(block_size_);
+}
 
 void *NonFreeMemPool::allocate(size_t size)
 {
@@ -135,6 +140,10 @@ SlabedMemPool::SlabedMemPool(size_t min, size_t max, float factor)
 }
 
 SlabedMemPool::~SlabedMemPool()
+{
+}
+
+SlabedMemPool::SlabedMemPool(const SlabedMemPool &pool)
 {
 }
 

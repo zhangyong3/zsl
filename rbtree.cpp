@@ -72,7 +72,7 @@ TreeNode *RBTree::remove(TreeNode *z)
 	if (z->left == &nil || z->right == &nil)
 		y = z;
 	else
-		y = getSuccessor(z);
+		y = (TreeNode*)getSuccessor(z);
 
 	if (y->left != &nil)
 		x = y->left;
@@ -137,9 +137,9 @@ void RBTree::removeAll()
 }
 
 
-TreeNode *RBTree::getSuccessor(TreeNode *x)
+const TreeNode *RBTree::getSuccessor(const TreeNode *x) const
 {
-	TreeNode *z = &nil;
+	TreeNode *z = (TreeNode*)&nil;
 	if (x->right != &nil) {
 		z = x->right;
 		while (z->left != &nil)
@@ -156,9 +156,9 @@ TreeNode *RBTree::getSuccessor(TreeNode *x)
 }
 
 
-TreeNode *RBTree::getAncestor(TreeNode *x)
+const TreeNode *RBTree::getAncestor(const TreeNode *x) const
 {
-	TreeNode *z = &nil;
+	TreeNode *z = (TreeNode*)&nil;
 	if (x->left != &nil) {
 		z = x->left;
 		while (z->right != &nil)

@@ -28,7 +28,7 @@ public:
 			p = new SetNodeType(std::make_pair(key, V()));
 			RBTree::insert(p);
 		} else {
-			p = it.cur;
+			p = (TreeNode*)it.cur;
 		}
 		return ((SetNodeType*)p)->data.second;
 	}

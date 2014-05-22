@@ -37,7 +37,7 @@ protected:
 	class _SetIterator
 	{
 	public:
-		_SetIterator(RBTree *tree, TreeNode *node, bool reverse=false)
+		_SetIterator(const RBTree *tree, const TreeNode *node, bool reverse=false)
 			: tree(tree), cur(node), isReverse(reverse)
 		{
 		}
@@ -75,8 +75,8 @@ protected:
 		}
 		
 	public:
-		RBTree *tree;
-		TreeNode *cur;
+		const RBTree *tree;
+		const TreeNode *cur;
 		bool isReverse;
 	};
 
@@ -91,7 +91,19 @@ public:
 		}
 		return Iterator(this, node);
 	}
+	const Iterator cbegin() const
+	{
+		TreeNode *node = root;
+		while (node != &nil && node->left != &nil) {
+			node = node->left;
+		}
+		return Iterator(this, node);
+	}
 	Iterator end()
+	{
+		return Iterator(this, &nil);
+	}
+	const Iterator cend() const
 	{
 		return Iterator(this, &nil);
 	}
